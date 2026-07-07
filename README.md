@@ -221,10 +221,3 @@ Potential areas of exploration include:
 * 📦 Dataset generation utilities
 * 🧠 Research workflows for vision-based motion understanding
 * 📐 Spatiotemporal DOF indexing tools
-
----
-
-## ⚖️ License
-
-This project is licensed under the **Mozilla Public License 2.0 (MPL-2.0)**.  
-See the [LICENSE](LICENSE) file for details.
