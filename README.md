@@ -4,19 +4,13 @@
 
 [
 
-![Python Version](https://img.shields.io/badge/python-3.8+-blue.svg)
-
-[(https://www.python.org/downloads/)
+![Python Version](https://img.shields.io/badge/python-3.8+-blue.svg)[(https://www.python.org/downloads/)
 ]
 
-![Version](https://img.shields.io/badge/version-0.0.2-orange.svg)
-
-[()
+![Version](https://img.shields.io/badge/version-0.0.2-orange.svg)[()
 ]
 
-![License](https://img.shields.io/badge/license-MPL--2.0-green.svg)
-
-[(LICENSE)
+![License](https://img.shields.io/badge/license-MPL--2.0-green.svg)[(LICENSE)
 ]
 
 **Kixel** is a Python library for representing kinematic motion as images without losing numerical precision.
