@@ -1,79 +1,231 @@
-# Kixel `0.0.1`
+Kixel
 
-Kixel is a small Python library that converts the motion of a 3D model or robot (a *Kinematic Character*) into a lossless image representation, so that vision models (ViT/CNN) can be trained to understand **motion** instead of ordinary images.
+«Lossless image representation for kinematic motion data.»
 
-Instead of normalizing angle values into a 0–255 range (which loses precision), Kixel encodes each `int32` motion value directly into the four RGBA channels of a pixel, one byte per channel — so no information is lost between the raw motion data and its image form. The transformation is fully reversible.
+Kixel is a Python library for representing kinematic motion as images without losing numerical precision.
 
-## Core Idea
+The library converts motion data from robots, articulated rigs, or 3D characters into an RGBA image representation that preserves every original bit of information. This allows motion sequences to be processed using image-oriented tools and machine learning pipelines while remaining fully reversible.
 
-```
-Karacter ──(create_motion)──► Kmatrix ──(encode_image)──► Kimage
-    ▲                             │                            │
-    │                             ├──(matframe)──► Kframe ◄─────┤(imgframe)
-    │                             │                            
-    │                             └──(decode_image)◄───────────┘
+Unlike traditional approaches that normalize values into a limited image range, Kixel stores each motion value as a full "int32" and encodes its four bytes directly into the RGBA channels of a pixel.
+
+Motivation
+
+Modern computer vision architectures such as Convolutional Neural Networks (CNNs) and Vision Transformers (ViTs) are optimized for image-like inputs.
+
+Kixel explores a simple question:
+
+«Can kinematic motion be represented as an image while preserving the exact original data?»
+
+To answer this, Kixel treats each motion value as a collection of four bytes and stores those bytes directly in RGBA space. The resulting image can be consumed by image-based pipelines while remaining a lossless representation of the underlying motion.
+
+Architecture
+
+Karacter
     │
-    └────────────(update_accumulator)◄──────────────┘
-```
+    ├── create_motion()
+    ▼
+Kmatrix (frames × dof)
+    │
+    ├── encode_image()
+    ▼
+Kimage (frames × dof × 4)
+    │
+    ├── decode_image()
+    ▼
+Kmatrix
+    │
+    ├── matframe()
+    └── imgframe()
+            ▼
+         Kframe
+            │
+            └── update_accumulator()
+                    ▼
+                Karacter
 
-A `Karacter`'s motion over time is stored as a `Kmatrix` (one row per frame, one column per degree of freedom). That matrix can be losslessly encoded into a `Kimage` (RGBA), and either representation can be decoded back or queried for a single `Kframe` at a given index. Each `Kframe` holds a *delta* (`d`) per DOF, which `update_accumulator` accumulates into the `Karacter`'s absolute angle — driving its actual motion.
+Data Model
 
-## Classes
+Karacter
 
-| Class | Description |
-|---|---|
-| `Karacter` | Represents a kinematic model (robot / rig / 3D character). Holds a `model_name`, a `dof_count` (`uint16`, number of degrees of freedom), and an `accumulator` (`uint32`) that holds the current absolute angle of each DOF, wrapping naturally at `360° = 0°`. |
-| `Kmatrix` | A row-major `int32` matrix of shape `(frames, dof)`. Each row is one full frame, stored contiguously in memory for fast GPU access. |
-| `Kimage` | A row-major `uint8` matrix of shape `(row, column, 4)` — an RGBA image representation of a `Kmatrix`. |
-| `Kframe` | A single frame: an `int32` array of length `dof`, subclassing `np.ndarray` directly so it behaves like a plain array. |
+Represents a kinematic system such as a robot, articulated rig, or animated character.
 
-## Functions
+Attributes:
 
-### `motion.py`
-- **`create_motion(karacter: Karacter, frames_number: int) -> Kmatrix`**
-  Builds an empty `Kmatrix` sized for the character's DOF count and the requested number of frames.
+Attribute| Type| Description
+"model_name"| "str"| Human-readable identifier
+"dof_count"| "uint16"| Number of degrees of freedom
+"accumulator"| "uint32[dof]"| Current accumulated state of every DOF
 
-### `image.py`
-- **`encode_image(kmatrix: Kmatrix) -> Kimage`**
-  Encodes a `Kmatrix` into a `Kimage` by splitting each `int32` value into 4 bytes (big-endian) mapped to the R, G, B, A channels.
-- **`decode_image(kimage: Kimage) -> Kmatrix`**
-  Reverses `encode_image`, reconstructing the original `Kmatrix` from a `Kimage`.
+---
 
-### `frame.py`
-- **`create_frame(dof: int) -> Kframe`**
-  Creates an empty `Kframe` of the given length.
-- **`matframe(index: np.uint64, kmatrix: Kmatrix) -> Kframe`**
-  Extracts a single frame from a `Kmatrix` by row index.
-- **`imgframe(index: np.uint64, kimage: Kimage) -> Kframe`**
-  Extracts a single frame directly from a `Kimage` by decoding one row.
+Kmatrix
 
-### `accumulator.py`
-- **`update_accumulator(karacter: Karacter, kframe: Kframe) -> None`**
-  Adds each delta value (`d`) held in a `Kframe` to the matching DOF's absolute angle in the `Karacter`'s `accumulator`, then zeroes out the `Kframe`. The addition wraps automatically at `2³²`, mirroring the `360° = 0°` circularity of the angle:
-  - Accumulator step: `360 / 4294967295` (`360 / 2³²`)
-  - Frame (delta) step: `180 / 2147483648` (`180 / 2³¹`, equal to `360 / 2³²`)
+Stores motion as a row-major matrix of signed 32-bit integers.
 
-  Because both steps are identical, the raw bits of the `int32` delta can be added directly onto the `uint32` accumulator with no rescaling.
+Shape:
 
-## Example
+(frames, dof)
 
-```python
-from kixel import Karacter, create_motion, encode_image, decode_image, matframe, update_accumulator
+Where:
+
+- Each row represents a frame.
+- Each column represents a degree of freedom.
+- Values are motion deltas encoded as "int32".
+
+---
+
+Kimage
+
+Lossless RGBA representation of a "Kmatrix".
+
+Shape:
+
+(frames, dof, 4)
+
+The final dimension contains:
+
+[R, G, B, A]
+
+corresponding to the four bytes of an "int32" value.
+
+---
+
+Kframe
+
+Represents a single motion frame.
+
+Shape:
+
+(dof,)
+
+Implemented as a direct subclass of "numpy.ndarray" for seamless interoperability with NumPy operations.
+
+Encoding Strategy
+
+Each motion value is stored as a signed 32-bit integer:
+
+int32
+
+Kixel converts the value into four bytes using a fixed big-endian layout:
+
+int32
+  │
+  ▼
+[B0][B1][B2][B3]
+  │   │   │   │
+  ▼   ▼   ▼   ▼
+  R   G   B   A
+
+The reverse operation reconstructs the original integer exactly.
+
+Because the transformation operates directly on raw bytes:
+
+- No normalization is performed.
+- No quantization is performed.
+- No rounding occurs.
+- No precision is lost.
+
+Accumulator Model
+
+Motion frames store relative changes (deltas).
+
+The accumulator stores the current absolute state.
+
+For each frame:
+
+accumulator ← accumulator + delta
+
+Internally:
+
+- Frame values are represented as "int32".
+- Accumulator values are represented as "uint32".
+- Arithmetic wraps naturally at "2³²".
+
+This provides a compact circular representation suitable for rotational systems.
+
+Lossless Guarantee
+
+The following identity always holds:
+
+decoded = decode_image(encode_image(kmatrix))
+
+np.array_equal(
+    kmatrix.kmatrix,
+    decoded.kmatrix
+)
+# True
+
+Encoding and decoding preserve every bit of the original motion data.
+
+Example
+
+from kixel import (
+    Karacter,
+    create_motion,
+    encode_image,
+    decode_image,
+    matframe,
+    update_accumulator,
+)
 
 robot = Karacter("robot_arm", 6)
-motion = create_motion(robot, 100)          # Kmatrix: 100 frames x 6 DOF
 
-image = encode_image(motion)                # Kimage: lossless RGBA encoding
-restored = decode_image(image)              # Kmatrix: reconstructed, identical to `motion`
+motion = create_motion(
+    karacter=robot,
+    frames_number=100
+)
 
-frame = matframe(0, motion)                 # Kframe: deltas for frame 0
-update_accumulator(robot, frame)            # advances robot.accumulator by that frame's deltas
-```
+image = encode_image(motion)
 
-## Byte Order
+restored = decode_image(image)
 
-All encoding/decoding uses a fixed **big-endian** byte order. This guarantees identical results across machines regardless of native endianness, and is not currently configurable.
+frame = matframe(0, motion)
 
-## Status
+update_accumulator(robot, frame)
 
-`0.0.1` — first working version. The full pipeline is in place: building motion containers, lossless encoding/decoding between `Kmatrix` and `Kimage`, extracting individual frames from either representation, and accumulating frame deltas into a `Karacter`'s live angular state.
+Byte Order
+
+Kixel uses a fixed big-endian representation for all encoding and decoding operations.
+
+This ensures identical results across platforms regardless of native machine endianness.
+
+Design Goals
+
+- Lossless motion representation
+- Deterministic encoding and decoding
+- NumPy-first implementation
+- Explicit memory layout
+- Platform-independent byte ordering
+- Compatibility with image-processing workflows
+
+Current Status
+
+Version: "0.0.1"
+
+Implemented features:
+
+- "Karacter"
+- "Kmatrix"
+- "Kimage"
+- "Kframe"
+- Motion creation
+- Frame extraction
+- Lossless image encoding
+- Lossless image decoding
+- Accumulator updates
+
+Future Directions
+
+Potential areas of exploration include:
+
+- Dataset generation utilities
+- PyTorch integration
+- TensorFlow integration
+- Motion visualization tools
+- Compression experiments
+- Temporal batching utilities
+- Research workflows for vision-based motion understanding
+
+License
+
+License information will be added in a future release.
