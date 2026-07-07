@@ -3,7 +3,7 @@ from ..classes.karacter import Karacter
 from ..classes.kframe import Kframe
 
 
-def update_accumulator(karacter: Karacter, kframe: Kframe) -> None:
+def acc_update(karacter: Karacter, kframe: Kframe) -> None:
     if kframe.shape[0] != int(karacter.dof_count):
         raise ValueError(
             f"kframe dof ({kframe.shape[0]}) does not match "
