@@ -3,7 +3,7 @@ from ..classes.kinematrix import Kinematrix
 from ..classes.kimage import Kimage
 
 
-def create_image(kinematrix: Kinematrix, big_endian: bool = True) -> Kimage:
+def encoding_image(kinematrix: Kinematrix, big_endian: bool = True) -> Kimage:
     img = Kimage(row=int(kinematrix.row), column=int(kinematrix.column))
 
     dtype_str = '>i4' if big_endian else '<i4'
