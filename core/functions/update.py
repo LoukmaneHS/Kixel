@@ -9,7 +9,7 @@ def update(karacter: Karacter, kframe: Kframe) -> None:
             f"kframe dof ({kframe.shape[0]}) does not match "
             f"karacter dof_count ({karacter.dof_count})"
         )
-    
-    karacter.o_acc[:] = karacter.n_acc
+
+    karacter.oacc[:] = karacter.nacc
     delta_bits = kframe.view(np.uint32)
-    karacter.n_acc = (karacter.n_acc + delta_bits).astype(np.uint32)
+    karacter.nacc = (karacter.nacc + delta_bits).astype(np.uint32)
