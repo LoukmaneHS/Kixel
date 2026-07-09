@@ -173,4 +173,3 @@ Kixel enforces a **fixed big-endian representation** across all image encoding a
 * [x] **NumPy-first** implementation with direct memory views
 * [x] **Explicit memory layout** with platform-independent byte ordering
 * [x] **Graphics-pipeline readiness** (Native compatibility with Blender and image workflows)
-* [ ] 
