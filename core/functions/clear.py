@@ -12,6 +12,8 @@ def clear(obj) -> None:
     elif isinstance(obj, Kimage):
         obj.kimage[:] = 0
     elif isinstance(obj, Karacter):
-        obj.accumulator[:] = 0
+        obj.nacc[:] = 0
+        obj.oacc[:] = 0
+        obj.sacc[:] = False
     else:
         raise TypeError(f"clear() does not support objects of type {type(obj).__name__}")
