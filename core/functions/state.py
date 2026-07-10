@@ -1,6 +1,6 @@
-import numpy as np
-from ..classes.karacter import Karacter
-
-
-def state(karacter: Karacter) -> np.ndarray:
-    return karacter.accumulator.copy()
+def state(karacter: Karacter) -> dict[str, np.ndarray]:
+    return {
+        "nacc": karacter.nacc.copy(),
+        "oacc": karacter.oacc.copy(),
+        "sacc": karacter.sacc.copy(),
+    }
