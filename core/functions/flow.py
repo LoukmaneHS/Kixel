@@ -4,7 +4,7 @@ from ..classes.kimage import Kimage
 from ..classes.kframe import Kframe
 
 
-def flow(index: np.uint16, source) -> Kframe:
+def flow(source, index: np.uint16) -> Kframe:
     if isinstance(source, Kmatrix):
         max_index = source.kmatrix.shape[0]
     elif isinstance(source, Kimage):
