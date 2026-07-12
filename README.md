@@ -224,7 +224,7 @@ def main():
 
     # 5. Incremental motion state update loop
     for i in range(FRAMES):
-        frame = flow(np.uint16(i), kmatrix)
+        frame = flow(kmatrix, np.uint16(i))
         update(karacter, frame)
         sign(karacter)
 
