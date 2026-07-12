@@ -61,7 +61,7 @@ $$I_{i,j,3} = M_{i,j} \pmod{256}$$
 
 Decoding reads the `Kimage` $I$ by reshaping and viewing the contiguous byte stream as big-endian 32-bit signed integers:
 
-$$M_{i,j} = \mathrm{view\_as\_int32}\left( \mathrm{big\_endian\_uint32}(I_{i,j,0..3}) \right)$$
+$$M_{i,j} = \text{view\_as\_int32}\left( \text{big\_endian\_uint32}(I_{i,j,0..3}) \right)$$
 
 > [!NOTE]
 > This mapping allows standard image manipulation pipelines and storage formats to act as a lossless transport layer for coordinate data.
@@ -72,8 +72,8 @@ For a character model `Karacter` with $C$ degrees of freedom, the motion state i
 
 When applying a frame displacement $F \in \mathbb{Z}^C$ (`Kframe`), the transition updates the historical state and performs vectorized modular addition:
 
-$${oacc}_k \leftarrow {nacc}_k \quad \forall k \in \{1, \dots, C\}$$
-$${nacc}_k \leftarrow \left( {nacc}_k + \mathrm{view\_as\_uint32}(F_k) \right) \pmod{2^{32}}$$
+$${\mathit{oacc}}_k \leftarrow {\mathit{nacc}}_k \quad \forall k \in \{1, \dots, C\}$$
+$${\mathit{nacc}}_k \leftarrow \left( {\mathit{nacc}}_k + \text{view\_as\_uint32}(F_k) \right) \pmod{2^{32}}$$
 > [!WARNING]
 > The mathematical conversion from `int32` to `uint32` during `update()` uses bitwise casting (`view(np.uint32)`). Modulo-32 arithmetic behaves as unsigned overflow addition.
 
@@ -81,8 +81,8 @@ $${nacc}_k \leftarrow \left( {nacc}_k + \mathrm{view\_as\_uint32}(F_k) \right) \
 
 The sign state indicator $sacc \in \{\text{True}, \text{False}\}^C$ records the direction of the transition. The difference is calculated in signed 32-bit representation:
 
-$${diff}_k = \mathrm{view\_as\_int32}\left( {nacc}_k - {oacc}_k \right)$$
-$${sacc}_k = \begin{cases} \text{True} & \text{if } {diff}_k \ge 0 \\ \text{False} & \text{if } {diff}_k < 0 \end{cases}$$
+$${\mathit{diff}}_k = \text{view\_as\_int32}\left( {\mathit{nacc}}_k - {\mathit{oacc}}_k \right)$$
+$${\mathit{sacc}}_k = \begin{cases} \text{True} & \text{if } {\mathit{diff}}_k \ge 0 \\ \text{False} & \text{if } {\mathit{diff}}_k < 0 \end{cases}$$
 ---
 
 ## 🛠️ API Reference
