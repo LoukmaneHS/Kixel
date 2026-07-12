@@ -1,12 +1,14 @@
 # 🌌 Kine Library
 
 <p align="left">
+  
   <img src="https://img.shields.io/badge/version-0.0.3-blue.svg?style=flat-square" alt="Version 0.0.3">
   
   <img 
 src="https://img.shields.io/badge/lang-Python_3-blue.svg?style=flat-square" alt="Python 3">
+
   <img
-  src="https://img.shields.io/badge/license-MPL_2.0-orange.svg?style=flat-square" alt="License MPL 2.0">
+src="https://img.shields.io/badge/license-MPL_2.0-orange.svg?style=flat-square" alt="License MPL 2.0">
   
   <img src="https://img.shields.io/badge/dependency-NumPy-blueviolet.svg?style=flat-square" alt="NumPy">
 </p>
