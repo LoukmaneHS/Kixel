@@ -246,5 +246,3 @@ if __name__ == "__main__":
 ## 📄 License
 
 This project is licensed under the **Mozilla Public License 2.0 (MPL 2.0)**. See the `LICENSE` file for details or review the terms at [https://www.mozilla.org/en-US/MPL/2.0/](https://www.mozilla.org/en-US/MPL/2.0/).
-
-```
