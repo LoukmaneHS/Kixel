@@ -10,7 +10,7 @@ src="https://img.shields.io/badge/language-Python_3-blue.svg?style=flat-square" 
 src="https://img.shields.io/badge/license-MPL_2.0-orange.svg?style=flat-square" alt="License MPL 2.0">
   <img src="https://img.shields.io/badge/dependency-NumPy-blueviolet.svg?style=flat-square" alt="NumPy">
 
-  <img src="https://img.shields.io/badge/By-OctaNon-bleu.svg?style=flat-square" alt="OctaNon">
+  <img src="https://img.shields.io/badge/by-OctaNon-bleuviolet.svg?style=flat-square" alt="OctaNon">
 </p>
 
 A high-performance Python library for motion state representation, vectorized accumulation, and lossless image-based serialization of multi-DOF (Degrees of Freedom) systems.
